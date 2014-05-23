@@ -28,39 +28,40 @@
     <body style='margin: 0px'>
         <script type="text/javascript" src="cordova.js"></script>
         <script>
-          // Use cordova network plugin to change the iframe hash: #offline #online
+          // Use cordova network plugin to inform the iframe about the connection
           document.addEventListener('deviceready', function() {
               if (!navigator.network || !navigator.network.connection || !Connection) {
                  console.log(">>> ERROR, it seems cordova network connection plugin has not been loaded.");
                  return;
               }
+
               var iframe = document.getElementById('app');
               var src = iframe.src.replace(/#.*$/, '');
-              var status = ''
-              function setStatus(sts) {
-                 iframe.src = src + '#' + sts;
+
+              function sendMessage(msg) {
+                // Select one mechanism: hash-fragment or postMessage
+                // iframe.src = src + '#cordova-' + msg;
+                iframe.contentWindow.postMessage("cordova-" + msg, "*");
               }
-              document.addEventListener('offline', function() {
-                 setStatus(status = 'offline');
-              }, false);
-              document.addEventListener('online', function() {
-                 setStatus(status = 'online');
-              }, false);
-              document.addEventListener('pause', function() {
-                 setStatus('pause');
-              }, false);
-              document.addEventListener('resume', function() {
-                 setStatus(status);
-              }, false);
-              document.addEventListener('backbutton', function() {
-                 console.log("Back button ignored");
-              }, false);
-              if (navigator.network.connection.type == Connection.NONE) {
-                 setStatus(status = 'offline');
+
+              function check() {
+                var sts = navigator.network.connection.type == Connection.NONE ? 'offline' : 'online';
+                sendMessage(sts);
               }
+
+              // Listen for offline/online events
+              document.addEventListener('offline', check, false);
+              document.addEventListener('online', check, false);
+
+              // check the connection, sometimes events are lost if 
+              // the app is paused
+              setInterval(check, 30000);
+
+              // Ignore back in android
+              // document.addEventListener('backbutton', function() {}, false);
           }, false);
         </script>
         <!-- Load the app in an iframe so as we can pass messages, instead of using redirect -->
-        <iframe id='app' style='width: 100%; height: 100%; position: absolute; border: none' src='http://evo.alcala.org/demo/'/>
+        <iframe id='app' style='width: 100%; height: 100%; position: absolute; border: none' src='http://evo.alcala.org/demo-3.0/'/>
     </body>
 </html>
