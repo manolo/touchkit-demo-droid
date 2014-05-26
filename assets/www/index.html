@@ -39,7 +39,7 @@
 	100% {-webkit-transform: rotate(360deg);}
 }
 </style>
-    </head>
+</head>
     <body style='margin: 0px'>
         <script type="text/javascript" src="cordova.js"></script>
         <script>
@@ -98,9 +98,9 @@
           }, false);
         </script>
         <!-- A div to show in the meanwhile the app is loaded -->
-        <div id='loading' style='font-size: 120%; width: 100%; height: 100%; position: absolute; text-align: center; display: flex; justify-content: center; flex-direction: column;'>
+        <div id='loading' style='font-size: 120%; font-family: helvetica; width: 100%; height: 100%; position: absolute; text-align: center;'>
           <div id='spinner'>}&gt;</div>
-          <div id='offline' style='display: none'>Downloading offline application files.<br/> Please be patient.</div>
+          <div id='offline' style='display: none; position: absolute; top: 40%; padding: 15px'>Downloading offline application files.<br/> Please be patient.</div>
         </div>
         <!-- Load the app in an iframe so as we can pass messages, instead of using redirect -->
         <iframe id='app' style='width: 0px; height: 0px; position: absolute; border: none' src='http://evo.alcala.org/demo-3.0/'/>
