@@ -36,32 +36,47 @@
               }
 
               var iframe = document.getElementById('app');
+              var loading = document.getElementById('loading');
               var src = iframe.src.replace(/#.*$/, '');
-
               function sendMessage(msg) {
                 // Select one mechanism: hash-fragment or postMessage
                 // iframe.src = src + '#cordova-' + msg;
                 iframe.contentWindow.postMessage("cordova-" + msg, "*");
               }
-
               function check() {
                 var sts = navigator.network.connection.type == Connection.NONE ? 'offline' : 'online';
                 sendMessage(sts);
+              }
+              function show(ev) {
+                if (loading.parentNode) {
+                  loading.parentNode.removeChild(loading);
+                  iframe.style.width = iframe.style.height = "100%";
+                }
               }
 
               // Listen for offline/online events
               document.addEventListener('offline', check, false);
               document.addEventListener('online', check, false);
-
-              // check the connection, sometimes events are lost if 
+              document.addEventListener('resume', function(){sendMessage('resume')}, false);
+              document.addEventListener('pause', function(){sendMessage('pause')}, false);
+              // check the connection, sometimes events are lost if
               // the app is paused
               setInterval(check, 30000);
 
-              // Ignore back in android
+              // when vaadin app is loaded, it sends to the parent window a ready message
+              window.addEventListener('message', show, false);
+              // if after a while we have not received any notification we show the iframe
+              // Here we could show an alert to the user or something
+              setTimeout(show, 20000);
+
+              // Ignore back button in android
               // document.addEventListener('backbutton', function() {}, false);
           }, false);
         </script>
+        <div id='loading' style='font-size: 120%; width: 100%; height: 100%; position: absolute; text-align: center; display: flex; justify-content: center; flex-direction: column;'>
+          Downloading application stuff.<br/> Please be patient.
+        </div>
         <!-- Load the app in an iframe so as we can pass messages, instead of using redirect -->
-        <iframe id='app' style='width: 100%; height: 100%; position: absolute; border: none' src='http://evo.alcala.org/demo-3.0/'/>
+        <iframe id='app' style='width: 0px; height: 0px; position: absolute; border: none' src='http://evo.alcala.org/demo-3.0/'/>
     </body>
 </html>
